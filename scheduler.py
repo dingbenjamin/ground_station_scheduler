@@ -24,7 +24,6 @@ def get_next_pass(satellite, satellite_name):
     ts = load.timescale()
     current = datetime.datetime.now()
     minutes = range(current.minute, 60 * 24 + current.minute)
-    # TODO(dingbenjamin): Add current minute
     t = ts.utc(current.year, current.month, current.day, current.hour, \
             minutes)
     
@@ -47,9 +46,15 @@ def schedule(tle_file, satellite_name, pass_script):
     if satellite_name in satellites:
         satellite = satellites[satellite_name]
         next_pass = get_next_pass(satellite, satellite_name)
+        
+        if next_pass[0] - 1 > 0:
+            minutes_to_wait = next_pass[0] - 1
+        else:
+            minutes_to_wait = 0
+
         # Schedule the defined command to run on a pass
         os.system("{} | at now + {} minutes".format(pass_script, \
-                str(next_pass[0] - 1)))
+                str(minutes_to_wait)))
         print("Scheduling success")
 
     else:
